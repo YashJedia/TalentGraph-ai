@@ -1,250 +1,274 @@
 # TalentGraph AI - System Architecture
 
-## 🏗️ Overall Architecture
+## Overview
 
-```
+TalentGraph AI is a modular candidate intelligence platform that combines semantic search, candidate analysis, and machine learning to assist recruiters in evaluating and ranking candidates. The application follows a layered architecture with separate frontend, backend, database, and AI processing components.
+
+---
+
+## System Architecture
+
+```text
 ┌─────────────────────────────────────────────────────────────────┐
-│                     Frontend (React + TailwindCSS)              │
-│  Dashboard | Search | Ranking | Hidden Gems | Fraud | Copilot  │
+│                 Frontend (React + TailwindCSS)                  │
+│ Dashboard | Search | Ranking | Hidden Gems | Fraud | Copilot   │
 └────────────────────┬────────────────────────────────────────────┘
-                     │ REST API / WebSocket
+                     │ REST API
 ┌────────────────────▼────────────────────────────────────────────┐
-│                   FastAPI Backend (Python)                       │
-│  ┌─────────────────────────────────────────────────────────────┐ │
-│  │            API Layer (Routes)                              │ │
-│  │  /jobs | /candidates | /rankings | /copilot | /fraud      │ │
-│  └─────────────────────────────────────────────────────────────┘ │
-│  ┌─────────────────────────────────────────────────────────────┐ │
-│  │           AI Agents Layer                                  │ │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐ │ │
-│  │  │Role          │  │Candidate     │  │Behavioral        │ │ │
-│  │  │Understanding │  │Intelligence  │  │Analysis          │ │ │
-│  │  └──────────────┘  └──────────────┘  └──────────────────┘ │ │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐ │ │
-│  │  │Career        │  │Fraud         │  │Ranking           │ │ │
-│  │  │Trajectory    │  │Detection     │  │                  │ │ │
-│  │  └──────────────┘  └──────────────┘  └──────────────────┘ │ │
-│  │  ┌──────────────────────────────────────────────────────┐ │ │
-│  │  │      Recruiter Copilot (LLM + RAG)                 │ │ │
-│  │  └──────────────────────────────────────────────────────┘ │ │
-│  └─────────────────────────────────────────────────────────────┘ │
-│  ┌─────────────────────────────────────────────────────────────┐ │
-│  │         Scoring & Analysis Engine                         │ │
-│  │  Hybrid Retrieval | Career Analysis | Fraud Scoring       │ │
-│  └─────────────────────────────────────────────────────────────┘ │
-│  ┌─────────────────────────────────────────────────────────────┐ │
-│  │         Embeddings Layer (SentenceTransformer)            │ │
-│  │  BAAI/bge-large-en-v1.5 (1024 dimensions)                │ │
-│  └─────────────────────────────────────────────────────────────┘ │
-└────────────────┬──────────────────────┬──────────────────────────┘
+│                  Backend (FastAPI + Python)                    │
+│                                                                │
+│  API Layer                                                     │
+│  /jobs | /candidates | /rankings | /copilot | /fraud           │
+│                                                                │
+│  Processing Layer                                              │
+│  • Role Understanding                                          │
+│  • Candidate Intelligence                                      │
+│  • Behavioral Analysis                                         │
+│  • Career Trajectory                                           │
+│  • Fraud Detection                                             │
+│  • Ranking Engine                                              │
+│  • Recruiter Copilot                                           │
+│                                                                │
+│  Embedding & Retrieval                                         │
+│  Sentence Transformers | Hybrid Search                         │
+└────────────────┬──────────────────────┬─────────────────────────┘
                  │                      │
-        ┌────────▼───────────┐   ┌─────▼──────────────┐
-        │  PostgreSQL        │   │  Qdrant Vector DB  │
-        │  (Relational Data) │   │  (Embeddings)      │
-        │                    │   │                    │
-        │ • Jobs             │   │ • Job embeddings   │
-        │ • Candidates       │   │ • Candidate        │
-        │ • Rankings         │   │   embeddings       │
-        │ • Interactions     │   │ • Query results    │
-        │ • Fraud Alerts     │   │                    │
-        └────────────────────┘   └────────────────────┘
+        ┌────────▼───────────┐   ┌──────▼─────────────┐
+        │ PostgreSQL         │   │ Qdrant            │
+        │ Relational Data    │   │ Vector Database   │
+        └────────────────────┘   └───────────────────┘
 ```
 
-## 🤖 AI Agents Architecture
+---
 
-### 1. **Role Understanding Agent**
-- **Input**: Job Description
-- **Process**:
-  - Parse JD semantically
-  - Extract technical requirements
-  - Identify soft skills needed
-  - Detect leadership requirements
-  - Analyze culture signals
-- **Output**:
-```python
-{
-    "technical_skills": [
-        {"skill": "Python", "proficiency": "expert", "priority": "critical"},
-        ...
-    ],
-    "soft_skills": [...],
-    "leadership_requirements": {...},
-    "seniority": "Senior",
-    "culture_signals": [...],
-    "job_embedding": Vector(1024)
-}
+## Architecture Components
+
+### Frontend
+
+The frontend provides the user interface for recruiters and administrators. It is responsible for candidate search, ranking visualization, fraud alerts, and interaction with the recruiter assistant.
+
+**Technology**
+
+- React
+- TypeScript
+- TailwindCSS
+- ShadCN UI
+
+---
+
+### Backend
+
+The backend exposes REST APIs and coordinates communication between the database, AI modules, and frontend.
+
+Primary responsibilities include:
+
+- API request handling
+- Candidate processing
+- Ranking generation
+- Fraud analysis
+- Embedding generation
+- Recruiter assistant integration
+
+---
+
+### Database Layer
+
+Two storage systems are used.
+
+| Component | Purpose |
+|----------|---------|
+| PostgreSQL | Stores structured application data such as jobs, candidates, rankings, and user records |
+| Qdrant | Stores vector embeddings for semantic similarity search |
+
+---
+
+## AI Processing Modules
+
+| Module | Responsibility |
+|---------|----------------|
+| Role Understanding | Extracts required skills and role information from job descriptions |
+| Candidate Intelligence | Processes candidate profiles and generates embeddings |
+| Behavioral Analysis | Evaluates profile quality and activity signals |
+| Career Trajectory | Analyzes career progression and professional growth |
+| Fraud Detection | Detects anomalous or inconsistent candidate profiles |
+| Ranking Engine | Combines evaluation metrics into a final ranking |
+| Recruiter Copilot | Provides contextual responses using Retrieval-Augmented Generation (RAG) |
+
+---
+
+## Candidate Ranking
+
+Candidate ranking combines semantic similarity with additional evaluation metrics.
+
+### Ranking Formula
+
+```text
+Final Score =
+0.35 × Semantic Match +
+0.20 × Experience Match +
+0.15 × Behavioral Score +
+0.10 × Career Growth +
+0.10 × Leadership +
+0.10 × Culture Fit
 ```
 
-### 2. **Candidate Intelligence Agent**
-- **Input**: Candidate Profile
-- **Process**:
-  - Analyze profile holistically
-  - Extract skills with proficiency
-  - Assess experience level
-  - Calculate depth in each domain
-  - Generate behavioral indicators
-- **Output**:
-```python
-{
-    "skill_depth": {...},
-    "experience_level": {...},
-    "leadership_score": 0.85,
-    "growth_score": 0.72,
-    "behavioral_score": 0.78,
-    "communication_score": 0.81,
-    "profile_embedding": Vector(1024)
-}
+### Score Distribution
+
+| Component | Weight |
+|-----------|-------:|
+| Semantic Match | 0.35 |
+| Experience Match | 0.20 |
+| Behavioral Score | 0.15 |
+| Career Growth | 0.10 |
+| Leadership | 0.10 |
+| Culture Fit | 0.10 |
+
+The weighted score is normalized before generating the final ranking.
+
+---
+
+## Candidate Retrieval
+
+The retrieval pipeline combines semantic similarity with keyword-based search.
+
+```text
+                Query
+                  │
+                  ▼
+        Embedding Generation
+                  │
+      ┌───────────┴───────────┐
+      │                       │
+      ▼                       ▼
+Vector Search          Keyword Search
+(Qdrant)              (PostgreSQL BM25)
+      │                       │
+      └───────────┬───────────┘
+                  ▼
+           Combined Ranking
 ```
 
-### 3. **Behavioral Analysis Agent**
-- **Metrics Tracked**:
-  - Profile Completeness
-  - Activity Recency
-  - Recruiter Response Rate
-  - Assessment Completion
-- **Output**: `behavioral_score` (0-1)
+---
 
-### 4. **Career Trajectory Agent**
-- **Metrics Calculated**:
-  - Promotion Velocity (promotions per year)
-  - Career Growth (salary/responsibility trend)
-  - Skill Evolution (skill progression)
-  - Responsibility Growth (scope expansion)
-- **Output**: `career_growth_score`, trajectory analysis
+## Data Flow
 
-### 5. **Fraud Detection Agent**
-- **Methods**: Isolation Forest Algorithm
-- **Detects**:
-  - Skill Stuffing (excessive skills listed)
-  - Timeline Inconsistencies (gaps/overlaps)
-  - Unrealistic Claims
-  - Suspicious Patterns
-- **Output**: `fraud_risk_score`, `anomaly_flags`
+### Job Processing
 
-### 6. **Ranking Agent**
-- **Input**: Job, Candidates, Scores
-- **Scoring Formula**:
-```
-Final Score = 
-  0.35 × Semantic Match +
-  0.20 × Experience Match +
-  0.15 × Behavioral Score +
-  0.10 × Career Growth +
-  0.10 × Leadership +
-  0.10 × Culture Fit
-```
-- **Output**: Ranked candidates with explanations
-
-### 7. **Recruiter Copilot Agent**
-- **Capabilities**:
-  - Answer ranking questions
-  - Compare candidates
-  - Suggest hidden gems
-  - Provide contextual recommendations
-- **Tech Stack**: RAG + LLM (Gemini/OpenAI)
-
-## 🔍 Hybrid Retrieval System
-
-```
-Query → Embedding Generation → Parallel Search
-                               ├→ Vector Search (Qdrant) → Embedding Similarity
-                               ├→ BM25 Search (PostgreSQL) → Keyword Match
-                               └→ Hybrid Score Combination
-                                   Score = 0.5 × Embedding_Sim + 0.5 × BM25
+```text
+Job Description
+        │
+        ▼
+Role Understanding
+        │
+        ▼
+Embedding Generation
+        │
+        ▼
+PostgreSQL + Qdrant
 ```
 
-## 📊 Scoring System
+### Candidate Processing
 
-### Individual Component Scores (0-1 scale):
-1. **Semantic Match (0.35 weight)**: How well candidate profile matches job requirements semantically
-2. **Experience Match (0.20 weight)**: Years of relevant experience + depth
-3. **Behavioral Score (0.15 weight)**: Profile completeness + activity + engagement
-4. **Career Growth (0.10 weight)**: Promotion velocity + skill evolution
-5. **Leadership (0.10 weight)**: Leadership experience + responsibility growth
-6. **Culture Fit (0.10 weight)**: Industry alignment + company size adaptation
-
-### Final Score Normalization:
-- All scores normalized to 0-100 scale
-- Top candidates highlighted
-- Percentile rankings calculated
-
-## 🔐 Security & Privacy
-
-- JWT authentication
-- Rate limiting on API endpoints
-- Data encryption at rest & in transit
-- Audit logging for all actions
-- GDPR compliance ready
-
-## 🚀 Deployment Architecture
-
-### Frontend (Vercel)
-- Automatic deployments from Git
-- CDN edge caching
-- Environment-specific configs
-
-### Backend (Render)
-- Docker containerization
-- Auto-scaling
-- Health checks
-
-### Database (Supabase)
-- PostgreSQL managed
-- Automatic backups
-- Connection pooling
-
-### Vector DB (Self-hosted/Qdrant Cloud)
-- High-availability setup
-- Vector index optimization
-- Snapshot backup strategy
-
-## 📈 Performance Metrics
-
-- **Retrieval Speed**: <500ms for top 10 candidates
-- **Embedding Generation**: <100ms per profile
-- **Ranking Calculation**: <200ms for 100 candidates
-- **API Response Time**: <1s for complex queries
-
-## 🗄️ Data Flow
-
-```
-1. Job Upload
-   ├→ Parse & Normalize
-   ├→ Role Understanding Agent
-   ├→ Generate Job Embedding
-   └→ Store in PostgreSQL + Qdrant
-
-2. Candidate Ingestion
-   ├→ Validate Schema
-   ├→ Candidate Intelligence Agent
-   ├→ Career Trajectory Analysis
-   ├→ Fraud Detection
-   ├→ Generate Embeddings
-   └→ Store in PostgreSQL + Qdrant
-
-3. Ranking Process
-   ├→ Hybrid Retrieval (BM25 + Embedding)
-   ├→ Score Calculation
-   ├→ Hidden Gems Detection
-   ├→ Generate Explanations (SHAP)
-   └→ Store Rankings
-
-4. Recruiter Interaction
-   ├→ User Query
-   ├→ Copilot Retrieval (RAG)
-   ├→ LLM Generation
-   └→ Stream Response
+```text
+Candidate Profile
+        │
+        ▼
+Candidate Analysis
+        │
+        ├── Behavioral Analysis
+        ├── Career Evaluation
+        ├── Fraud Detection
+        └── Embedding Generation
+                │
+                ▼
+        PostgreSQL + Qdrant
 ```
 
-## 🔄 Technology Stack Summary
+### Ranking Process
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| Frontend | React, TailwindCSS, ShadCN | UI/UX |
-| Backend | FastAPI, Python | APIs, Business Logic |
-| Database | PostgreSQL | Relational Data |
-| Vector DB | Qdrant | Embeddings, Similarity Search |
-| Embeddings | Sentence Transformers | Text to Vector |
-| LLM | Gemini/OpenAI | Agent Intelligence, Copilot |
-| ML | Scikit-Learn, SHAP, NetworkX | Fraud Detection, Explainability |
-| Deployment | Vercel, Render, Supabase | Cloud Infrastructure |
+```text
+Job Request
+      │
+      ▼
+Hybrid Retrieval
+      │
+      ▼
+Score Calculation
+      │
+      ▼
+Ranked Candidates
+```
+
+### Recruiter Interaction
+
+```text
+Recruiter Query
+        │
+        ▼
+Retrieve Context
+        │
+        ▼
+LLM Response
+```
+
+---
+
+## Deployment
+
+| Component | Platform |
+|-----------|----------|
+| Frontend | Vercel |
+| Backend | Render |
+| Database | PostgreSQL (Supabase) |
+| Vector Database | Qdrant |
+
+---
+
+## Technology Stack
+
+| Layer | Technology |
+|------|------------|
+| Frontend | React, TypeScript, TailwindCSS, ShadCN UI |
+| Backend | FastAPI, Python |
+| Database | PostgreSQL |
+| Vector Database | Qdrant |
+| Embeddings | Sentence Transformers |
+| Machine Learning | Scikit-learn, SHAP, NetworkX |
+| LLM | Gemini / OpenAI |
+| Deployment | Docker, Vercel, Render, Supabase |
+
+---
+
+## Project Structure
+
+```text
+talentgraph-ai/
+│
+├── backend/
+│   ├── api/
+│   ├── agents/
+│   ├── config/
+│   ├── db/
+│   ├── models/
+│   ├── services/
+│   └── main.py
+│
+├── frontend/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   ├── styles/
+│   └── App.tsx
+│
+├── docker/
+├── DATABASE_SCHEMA.sql
+├── docker-compose.yml
+├── README.md
+└── ARCHITECTURE.md
+```
+
+---
+
+## Summary
+
+TalentGraph AI follows a modular architecture that separates presentation, business logic, AI processing, and data storage into independent layers. This design simplifies maintenance, enables future feature additions, and supports semantic candidate search, intelligent ranking, and recruiter assistance through a scalable backend architecture.

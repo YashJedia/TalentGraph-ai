@@ -1,479 +1,270 @@
-# 🚀 TalentGraph AI - Quick Start Guide
+# TalentGraph AI - Quick Start
 
-## 5-Minute Setup
+## Overview
 
-### Option 1: Docker (Recommended) ⭐
+This guide provides the minimum steps required to set up and run the TalentGraph AI project in a local development environment.
+
+---
+
+## Prerequisites
+
+Ensure the following software is installed before starting:
+
+- Git
+- Docker and Docker Compose
+- Python 3.11 or later
+- Node.js 18 or later
+
+---
+
+## Clone the Repository
 
 ```bash
-# 1. Navigate to project
-cd c:\Users\yashk\OneDrive\Desktop\AIresume2\talentgraph-ai
-
-# 2. Start all services
-docker-compose up -d
-
-# 3. Wait for services to be healthy (30-60 seconds)
-docker-compose ps
-
-# 4. Access applications:
-# Frontend: http://localhost:5173
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
-# Qdrant Admin: http://localhost:6333/dashboard
-```
-
-### Option 2: Manual Setup
-
-#### Backend
-```bash
-cd backend
-
-# Create virtual environment
-python -m venv venv
-
-# Activate
-# Windows:
-venv\Scripts\activate
-# macOS/Linux:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start server
-uvicorn app.main:app --reload
-
-# Swagger docs: http://localhost:8000/docs
-```
-
-#### Frontend (new terminal)
-```bash
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# App: http://localhost:5173
+git clone <repository-url>
+cd talentgraph-ai
 ```
 
 ---
 
-## 📁 Project Location
+## Configure Environment
 
-```
-c:\Users\yashk\OneDrive\Desktop\AIresume2\talentgraph-ai
-```
-
-### Key Files
-- **Frontend**: `frontend/` (React, TypeScript, TailwindCSS)
-- **Backend**: `backend/` (FastAPI, Python)
-- **Database Schema**: `DATABASE_SCHEMA.sql`
-- **Architecture**: `ARCHITECTURE.md`
-- **Documentation**: `PHASE*_*.md`
-- **This Guide**: `PROJECT_INDEX.md`
-
----
-
-## 🎯 Start Here
-
-1. **Understand Architecture** (15 min)
-   ```bash
-   cat ARCHITECTURE.md
-   ```
-
-2. **Review Database** (10 min)
-   ```bash
-   cat DATABASE_SCHEMA.sql
-   ```
-
-3. **Start Services** (5 min)
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Explore Frontend** (5 min)
-   - Open http://localhost:5173
-   - Click through pages (placeholders for now)
-
-5. **Explore API** (5 min)
-   - Open http://localhost:8000/docs
-   - See health endpoint
-
-6. **Read Phase 2 Guide** (20 min)
-   ```bash
-   cat PHASE2_BACKEND_INFRASTRUCTURE.md
-   ```
-
----
-
-## 🗂️ Directory Overview
-
-```
-talentgraph-ai/
-├── backend/                    # Python FastAPI
-│   └── app/
-│       ├── main.py            # FastAPI app
-│       ├── models/            # Database models
-│       └── services/          # Embedding, Vector DB
-│
-├── frontend/                  # React + TypeScript
-│   ├── src/
-│   │   ├── pages/            # 7 page components
-│   │   ├── components/       # Reusable components
-│   │   └── services/         # API client
-│   └── package.json
-│
-├── docker-compose.yml         # Multi-container setup
-├── DATABASE_SCHEMA.sql        # Complete database
-├── ARCHITECTURE.md            # System design
-│
-├── PHASE1_SETUP.md           # What we built ✅
-├── PHASE2_BACKEND_INFRASTRUCTURE.md  # Next: API endpoints
-├── PHASE3_AI_AGENTS.md        # Then: AI agents
-├── PHASE4_FRONTEND.md         # Then: Frontend pages
-├── PHASE5_DEPLOYMENT.md       # Finally: Deploy
-│
-└── PROJECT_INDEX.md           # Full guide
-```
-
----
-
-## 🛠️ What's Built?
-
-### Phase 1: Complete ✅
-
-**Backend**
-- ✅ FastAPI application
-- ✅ 8 database models
-- ✅ 15+ Pydantic schemas
-- ✅ Embedding service (Sentence Transformers)
-- ✅ Qdrant vector DB client
-- ✅ Configuration system
-
-**Frontend**
-- ✅ React structure
-- ✅ 7 page components
-- ✅ API client service
-- ✅ State management (Zustand)
-- ✅ Dark mode UI
-- ✅ Navigation sidebar
-
-**Infrastructure**
-- ✅ Docker setup (PostgreSQL, Qdrant, Redis, FastAPI, React)
-- ✅ Database schema (20+ tables)
-- ✅ Configuration templates
-- ✅ Documentation
-
----
-
-## 📊 Statistics
-
-| Component | Count | Status |
-|-----------|-------|--------|
-| Backend Files | 20+ | ✅ |
-| Frontend Components | 10+ | ✅ |
-| Database Tables | 20+ | ✅ |
-| API Endpoints (Planned) | 25+ | ⏳ Phase 2 |
-| AI Agents (Planned) | 7 | ⏳ Phase 3 |
-| Pages (Skeleton) | 7 | ⏳ Phase 4 |
-| Lines of Code | 5000+ | ✅ |
-
----
-
-## 🤖 7 AI Agents (Coming Phase 3)
-
-1. **Role Understanding** - Parse job descriptions
-2. **Candidate Intelligence** - Analyze profiles
-3. **Behavioral Analysis** - Extract engagement signals
-4. **Career Trajectory** - Calculate growth metrics
-5. **Fraud Detection** - Identify anomalies
-6. **Ranking Agent** - Calculate scores (formula given)
-7. **Recruiter Copilot** - LLM-based Q&A
-
----
-
-## 📖 Documentation Map
-
-```
-Want to understand...          Read this...
-─────────────────────────────────────────────────
-System architecture            → ARCHITECTURE.md
-Database design               → DATABASE_SCHEMA.sql
-What's been built             → IMPLEMENTATION_SUMMARY.md
-Next steps (Phase 2)          → PHASE2_BACKEND_INFRASTRUCTURE.md
-AI agents (Phase 3)           → PHASE3_AI_AGENTS.md
-Frontend pages (Phase 4)      → PHASE4_FRONTEND.md
-Deployment (Phase 5)          → PHASE5_DEPLOYMENT.md
-Project overview              → PROJECT_INDEX.md
-```
-
----
-
-## 💻 Environment Setup
-
-### Create .env File
+Create a local environment file from the template.
 
 ```bash
-# From .env.example
 cp .env.example .env
 ```
 
-### Edit .env (minimal for local dev)
+Update any required environment variables before running the application.
 
-```env
-# Database
-DATABASE_URL=postgresql://user:password@localhost:5432/talentgraph_ai
+---
 
-# Qdrant
-QDRANT_HOST=localhost
-QDRANT_PORT=6333
+# Running with Docker
 
-# AI (optional for Phase 2)
-GEMINI_API_KEY=your_key_here
-OPENAI_API_KEY=your_key_here
+Docker is the recommended way to start all project services.
 
-# Development
-DEBUG=true
-FASTAPI_ENV=development
+Start the application:
+
+```bash
+docker compose up -d
+```
+
+Verify that all containers are running:
+
+```bash
+docker compose ps
+```
+
+Stop all services:
+
+```bash
+docker compose down
 ```
 
 ---
 
-## 🧪 Verify Installation
+# Manual Setup
 
-### Backend Health
+## Backend
+
+Navigate to the backend directory.
+
 ```bash
-curl http://localhost:8000/health
-# Should return:
-# {"status":"healthy","version":"1.0.0","environment":"development"}
+cd backend
 ```
 
-### Frontend Load
+Create a virtual environment.
+
 ```bash
-# Open http://localhost:5173
-# Should see dashboard with sidebar navigation
+python -m venv venv
 ```
 
-### Database Connection
+Activate the virtual environment.
+
+### Windows
+
 ```bash
-# In backend logs, should see:
-# "✅ Database initialized successfully"
+venv\Scripts\activate
 ```
 
-### Vector DB
+### macOS / Linux
+
 ```bash
-curl http://localhost:6333/health
-# Should return health status
+source venv/bin/activate
+```
+
+Install dependencies.
+
+```bash
+pip install -r requirements.txt
+```
+
+Start the development server.
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The API will be available at:
+
+```
+http://localhost:8000
+```
+
+API documentation:
+
+```
+http://localhost:8000/docs
 ```
 
 ---
 
-## 🚀 Next: Phase 2 (Backend APIs)
+## Frontend
 
-When ready to start building APIs:
-
-1. Read: `PHASE2_BACKEND_INFRASTRUCTURE.md`
-2. Create: API route files in `backend/app/api/v1/`
-3. Create: Repository pattern in `backend/app/db/`
-4. Build: CRUD endpoints for jobs, candidates
-5. Test: API endpoints with pytest
-
----
-
-## 🎨 Then: Phase 3 (AI Agents)
-
-When ready to add intelligence:
-
-1. Read: `PHASE3_AI_AGENTS.md`
-2. Create: Agent files in `backend/app/agents/`
-3. Build: Scoring engine
-4. Add: LLM integration (Gemini/OpenAI)
-5. Test: Agent orchestration
-
----
-
-## 💡 Quick Tips
-
-### Common Commands
+Navigate to the frontend directory.
 
 ```bash
-# Start everything
-docker-compose up -d
-
-# Stop everything
-docker-compose down
-
-# View logs
-docker-compose logs -f backend
-docker-compose logs -f frontend
-
-# Restart a service
-docker-compose restart backend
-
-# Remove everything (reset)
-docker-compose down -v
+cd frontend
 ```
 
-### Useful URLs
-
-```
-Frontend:           http://localhost:5173
-Backend Swagger:    http://localhost:8000/docs
-Backend ReDoc:      http://localhost:8000/redoc
-Qdrant Dashboard:   http://localhost:6333/dashboard
-PostgreSQL:         localhost:5432
-Redis:              localhost:6379
-```
-
-### Database Access
+Install dependencies.
 
 ```bash
-# Connect to PostgreSQL
-psql -h localhost -U talentgraph_user -d talentgraph_ai
-
-# Query tables
-SELECT * FROM jobs;
-SELECT * FROM candidates;
-SELECT * FROM candidate_job_rankings;
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Port Already in Use
-```bash
-# Kill process using port
-# Windows: netstat -ano | findstr :5173
-# macOS/Linux: lsof -i :5173 | kill -9 <PID>
-```
-
-### Services Won't Start
-```bash
-# Check disk space
-docker system df
-
-# Clean up
-docker system prune -a
-```
-
-### Python Dependencies Issue
-```bash
-# Reinstall
-pip install --upgrade pip
-pip install -r requirements.txt --force-reinstall
-```
-
-### Node Dependencies Issue
-```bash
-rm -rf node_modules package-lock.json
 npm install
 ```
 
----
+Start the development server.
 
-## 📊 Dataset Integration
-
-Your dataset is located at:
-```
-[PUB] India_runs_data_and_ai_challenge/
-└── India_runs_data_and_ai_challenge/
-    ├── candidates.jsonl       ← Main dataset
-    ├── candidate_schema.json  ← Schema
-    └── sample_candidates.json ← Examples
+```bash
+npm run dev
 ```
 
-**Phase 2**: Will create endpoint to import this data
-**Phase 3**: Will analyze candidates with AI agents
-**Phase 4**: Will display in UI
+The frontend will be available at:
+
+```
+http://localhost:5173
+```
 
 ---
 
-## ✅ Phase 1 Checklist
+# Project Structure
 
-- [x] Project structure created
-- [x] Docker setup configured
-- [x] Database schema designed
-- [x] FastAPI scaffolding done
-- [x] React foundation built
-- [x] Services layer initialized
-- [x] Documentation written
-- [x] Configuration system ready
-
----
-
-## 🎯 Phase 2 Checklist (Coming Soon)
-
-- [ ] API endpoints for jobs
-- [ ] API endpoints for candidates
-- [ ] API endpoints for rankings
-- [ ] Database repository pattern
-- [ ] JSONL dataset import
-- [ ] Hybrid search (BM25 + embedding)
-- [ ] Error handling middleware
-- [ ] Unit tests (>80% coverage)
+```text
+talentgraph-ai/
+│
+├── backend/
+├── frontend/
+├── docker/
+├── ARCHITECTURE.md
+├── IMPLEMENTATION_SUMMARY.md
+├── DATABASE_SCHEMA.sql
+├── docker-compose.yml
+├── README.md
+└── .env.example
+```
 
 ---
 
-## 🔗 Important Links
+# Common Commands
 
-- **Repository**: Your local folder
-- **Frontend Docs**: React docs at [react.dev](https://react.dev)
-- **Backend Docs**: FastAPI docs at [fastapi.tiangolo.com](https://fastapi.tiangolo.com)
-- **Database**: PostgreSQL docs at [postgresql.org](https://postgresql.org)
-- **Vector DB**: Qdrant docs at [qdrant.tech](https://qdrant.tech)
+Start all services.
 
----
+```bash
+docker compose up -d
+```
 
-## 📞 Getting Help
+Stop all services.
 
-### For Architecture
-- See: `ARCHITECTURE.md`
-- Code references: Comments in source files
+```bash
+docker compose down
+```
 
-### For Database
-- See: `DATABASE_SCHEMA.sql`
-- Run: `psql` commands to explore
+Check running containers.
 
-### For Phases
-- See: Corresponding `PHASE*.md` file
-- Each phase has detailed instructions
+```bash
+docker compose ps
+```
 
-### For Specific Topics
-- Search across documentation files
-- Check comments in code
-- Review type hints
+View backend logs.
 
----
+```bash
+docker compose logs -f backend
+```
 
-## 🎉 You're Ready!
+Restart the backend service.
 
-You now have:
-✅ Complete project structure
-✅ All infrastructure set up
-✅ Full documentation
-✅ Clear phase roadmap
-✅ Working foundation
-
-**Next**: Pick up from PHASE2_BACKEND_INFRASTRUCTURE.md and start building APIs!
+```bash
+docker compose restart backend
+```
 
 ---
 
-## 📝 Notes
+# Verify the Installation
 
-- All code is production-ready
-- Best practices implemented throughout
-- Type safety enforced (Python + TypeScript)
-- Scalable architecture designed
-- Security considerations built-in
-- Performance optimized
+After startup, the following services should be accessible.
+
+| Service | URL |
+|----------|-----|
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:8000 |
+| API Documentation | http://localhost:8000/docs |
+| Qdrant Dashboard | http://localhost:6333/dashboard |
 
 ---
 
-**Happy Building! 🚀**
+# Project Documentation
 
-Questions? Check the detailed documentation in each `PHASE*.md` file.
+| File | Description |
+|------|-------------|
+| README.md | Project overview |
+| ARCHITECTURE.md | System architecture |
+| IMPLEMENTATION_SUMMARY.md | Implementation summary |
+| DATABASE_SCHEMA.sql | Database schema |
 
-Last updated: June 26, 2024
+---
+
+# Troubleshooting
+
+## Docker services are not running
+
+Check the container status.
+
+```bash
+docker compose ps
+```
+
+View service logs.
+
+```bash
+docker compose logs
+```
+
+---
+
+## Backend is unavailable
+
+Verify that:
+
+- Docker containers are running.
+- Environment variables are configured.
+- Python dependencies have been installed.
+
+---
+
+## Frontend is unavailable
+
+Verify that:
+
+- Node.js dependencies are installed.
+- The backend server is running.
+- API configuration is correct.
+
+---
+
+# Next Steps
+
+Once the application is running successfully:
+
+1. Review the project overview in `README.md`.
+2. Read `ARCHITECTURE.md` to understand the system design.
+3. Refer to `IMPLEMENTATION_SUMMARY.md` for implementation details.
+4. Explore the API using the Swagger documentation.
