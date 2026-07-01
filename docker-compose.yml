@@ -1,0 +1,109 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: talentgraph_postgres
+    environment:
+      POSTGRES_USER: talentgraph_user
+      POSTGRES_PASSWORD: talentgraph_password
+      POSTGRES_DB: talentgraph_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./DATABASE_SCHEMA.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "talentgraph_user", "-d", "talentgraph_ai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - talentgraph_network
+
+  # Qdrant Vector Database
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: talentgraph_qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    environment:
+      QDRANT_API_KEY: talentgraph_qdrant_key
+    networks:
+      - talentgraph_network
+
+  # Redis (for caching)
+  redis:
+    image: redis:7-alpine
+    container_name: talentgraph_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - talentgraph_network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: talentgraph_backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      DATABASE_URL: postgresql://talentgraph_user:talentgraph_password@postgres:5432/talentgraph_ai
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      REDIS_URL: redis://redis:6379
+      FASTAPI_ENV: development
+      DEBUG: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - "../[PUB] India_runs_data_and_ai_challenge/India_runs_data_and_ai_challenge:/app/data/candidate_dataset:ro"
+    networks:
+      - talentgraph_network
+
+  # Frontend (React dev server)
+  frontend:
+    image: node:20-alpine
+    container_name: talentgraph_frontend
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev"
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://backend:8000/api/v1
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    networks:
+      - talentgraph_network
+
+volumes:
+  postgres_data:
+  qdrant_storage:
+  redis_data:
+  frontend_node_modules:
+
+networks:
+  talentgraph_network:
+    driver: bridge
