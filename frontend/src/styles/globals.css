@@ -13,8 +13,8 @@
   --primary: #38bdf8;
   --primary-dark: #0f172a;
   --secondary: #c084fc;
-  --background: #070913;
-  --background-secondary: #0c0f1d;
+  --background: #0f1222;
+  --background-secondary: #13172e;
   --surface: rgba(17, 24, 39, 0.82);
   --surface-strong: #0f172a;
   --surface-soft: rgba(17, 24, 39, 0.6);
@@ -37,7 +37,7 @@ html {
 body {
   min-height: 100vh;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #070913;
+  background: #0f1222;
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -248,4 +248,179 @@ textarea:focus {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Outfit', sans-serif;
   letter-spacing: -0.02em;
+}
+
+/* ==========================================================================
+   LIGHT MODE STYLING SCHEME
+   ========================================================================== */
+body.light-mode {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  --text-primary: #0f172a;
+}
+
+body.light-mode .text-white,
+body.light-mode h1,
+body.light-mode h2,
+body.light-mode h3,
+body.light-mode h4 {
+  color: #0f172a !important;
+}
+
+body.light-mode .text-slate-100 {
+  color: #0f172a !important;
+}
+
+body.light-mode .text-slate-300,
+body.light-mode .text-slate-200 {
+  color: #1e293b !important;
+}
+
+body.light-mode .text-slate-400 {
+  color: #475569 !important;
+}
+
+body.light-mode .text-slate-500 {
+  color: #64748b !important;
+}
+
+body.light-mode .glass-card {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  backdrop-filter: blur(24px) !important;
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02) !important;
+}
+
+body.light-mode aside {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode header {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-mode footer {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode .bg-slate-900\/30,
+body.light-mode .bg-slate-950\/40,
+body.light-mode .bg-slate-900\/40,
+body.light-mode .bg-slate-900\/20,
+body.light-mode .bg-slate-950\/20,
+body.light-mode .bg-slate-900\/10,
+body.light-mode .bg-slate-900\/60,
+body.light-mode .bg-slate-950\/66,
+body.light-mode .bg-slate-950\/80 {
+  background: rgba(241, 245, 249, 0.7) !important;
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-mode .border-slate-800,
+body.light-mode .border-slate-800\/40,
+body.light-mode .border-slate-800\/50,
+body.light-mode .border-slate-800\/60,
+body.light-mode .border-slate-900,
+body.light-mode .border-slate-900\/40,
+body.light-mode .border-slate-900\/60,
+body.light-mode .border-slate-900\/80 {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode select,
+body.light-mode input {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+body.light-mode .text-indigo-400 {
+  color: #4f46e5 !important;
+}
+
+body.light-mode .bg-indigo-500\/5 {
+  background: rgba(79, 70, 229, 0.06) !important;
+}
+
+body.light-mode .border-indigo-500\/10 {
+  border-color: rgba(79, 70, 229, 0.12) !important;
+}
+
+body.light-mode .bg-indigo-500\/10 {
+  background: rgba(79, 70, 229, 0.08) !important;
+}
+
+body.light-mode .border-indigo-500\/15 {
+  border-color: rgba(79, 70, 229, 0.15) !important;
+}
+
+body.light-mode .bg-slate-900 {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+}
+
+body.light-mode table {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-mode thead {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+
+body.light-mode tr {
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+body.light-mode tr:hover {
+  background: rgba(15, 23, 42, 0.02) !important;
+}
+
+/* Sidebar Specific overrides */
+body.light-mode aside .bg-slate-900 {
+  background: #f1f5f9 !important;
+  border-color: rgba(15, 23, 42, 0.05) !important;
+  color: #64748b !important;
+}
+
+body.light-mode aside a.group:not(.glow-card) {
+  color: #475569 !important;
+}
+
+body.light-mode aside a.group:not(.glow-card):hover {
+  background: rgba(15, 23, 42, 0.03) !important;
+  color: #0f172a !important;
+}
+
+body.light-mode aside a.group.glow-card {
+  background: rgba(2, 132, 199, 0.08) !important;
+  border-color: rgba(2, 132, 199, 0.15) !important;
+  color: #0284c7 !important;
+  box-shadow: 0 4px 12px -2px rgba(2, 132, 199, 0.08) !important;
+}
+
+body.light-mode aside a.mt-4 {
+  background: #ffffff !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  color: #334155 !important;
+}
+
+body.light-mode aside a.mt-4:hover {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Recharts / tooltip custom styling overrides in light mode */
+body.light-mode .recharts-tooltip-wrapper {
+  color: #0f172a !important;
 }

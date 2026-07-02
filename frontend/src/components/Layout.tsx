@@ -1,19 +1,36 @@
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import Header from './Header'
 import Sidebar from './Sidebar'
 import Footer from './Footer'
+import { useAppStore } from '../context/store'
 
 interface LayoutProps {
   children: ReactNode
 }
 
 export default function Layout({ children }: LayoutProps) {
+  const { darkMode } = useAppStore()
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.remove('light-mode')
+    } else {
+      document.body.classList.add('light-mode')
+    }
+  }, [darkMode])
+
   return (
-    <div className="relative flex min-h-screen bg-[#070913] text-slate-100 overflow-hidden">
+    <div className={`relative flex min-h-screen text-slate-100 overflow-hidden transition-colors duration-300 ${
+      darkMode ? 'bg-[#0f1222]' : 'bg-[#f8fafc]'
+    }`}>
       {/* Dynamic Background Blobs */}
-      <div className="blob-sky" />
-      <div className="blob-violet" />
-      <div className="blob-extra" />
+      {darkMode && (
+        <>
+          <div className="blob-sky" />
+          <div className="blob-violet" />
+          <div className="blob-extra" />
+        </>
+      )}
 
       <div className="relative z-10 flex w-full">
         <Sidebar />
