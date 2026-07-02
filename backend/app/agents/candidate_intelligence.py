@@ -20,8 +20,23 @@ class CandidateIntelligenceAgent:
             candidate.current_title or '',
             candidate.current_company or '',
         ]
-        lines.extend([skill.skill_name for skill in candidate.skills or []])
-        lines.extend([career.title or '' for career in candidate.career_history or []])
+
+        loaded_skills = candidate.__dict__.get('skills') or []
+        if loaded_skills:
+            lines.extend([skill.skill_name or '' for skill in loaded_skills])
+        elif candidate.raw_data:
+            lines.extend(
+                [skill.get('name') for skill in candidate.raw_data.get('skills', []) if skill.get('name')]
+            )
+
+        loaded_career = candidate.__dict__.get('career_history') or []
+        if loaded_career:
+            lines.extend([career.title or '' for career in loaded_career])
+        elif candidate.raw_data:
+            lines.extend(
+                [entry.get('title') for entry in candidate.raw_data.get('career_history', []) if entry.get('title')]
+            )
+
         return ' | '.join([line for line in lines if line])
 
     def _calculate_skill_depth(self, candidate: Candidate) -> Dict[str, Dict[str, object]]:

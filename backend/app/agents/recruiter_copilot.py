@@ -1,7 +1,9 @@
 from typing import Dict, Optional, List
+from app.services.embeddings import get_embedding_service
 from app.services.llm_service import LLMService
 from app.services.qdrant import get_qdrant_service
 from app.models.database import CandidateJobRanking, Candidate, Job
+from app.config.settings import settings
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -18,7 +20,7 @@ class RecruiterCopilotAgent:
 
         try:
             qdrant = get_qdrant_service()
-            query_vector = self.llm._build_prompt(user_query, context)
+            query_vector = get_embedding_service().embed(user_query)
         except Exception:
             query_vector = None
 
@@ -36,10 +38,9 @@ class RecruiterCopilotAgent:
                 context_data['candidate_name'] = candidate.anonymized_name or ''
                 context_data['candidate_title'] = candidate.current_title or ''
 
-        if query_vector and isinstance(query_vector, str):
-            related = []
+        if query_vector and isinstance(query_vector, list):
             try:
-                search_results = qdrant.search('candidates_embeddings', [0.0] * 1024, limit=5)
+                search_results = qdrant.search(settings.QDRANT_COLLECTION_CANDIDATES, query_vector, limit=5)
                 for hit in search_results:
                     related_candidates.append(hit.get('id'))
                     related_summaries.append(str(hit.get('payload', {})))

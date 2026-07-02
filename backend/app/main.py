@@ -47,7 +47,7 @@ def create_app() -> FastAPI:
     )
 
     # Register Phase 2 API routes
-    from app.api.routes import api_router, TalentGraphException
+    from app.api.v1 import api_router
     app.include_router(api_router, prefix=settings.API_PREFIX)
 
     # Health check endpoint
@@ -58,13 +58,6 @@ def create_app() -> FastAPI:
             "version": settings.API_VERSION,
             "environment": settings.FASTAPI_ENV,
         }
-
-    @app.exception_handler(TalentGraphException)
-    async def talent_graph_exception_handler(request, exc):
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"detail": str(exc)},
-        )
 
     logger.info("✅ FastAPI application created successfully")
     return app

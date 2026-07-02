@@ -36,13 +36,13 @@ class TalentGraphOrchestrator:
     async def rank_job(self, job: Job, candidates: List[Candidate], session: AsyncSession, limit: Optional[int] = None) -> List[CandidateJobRanking]:
         analyzed_candidates = []
         for candidate in candidates:
-            if candidate.profile_embedding is None:
+            if getattr(candidate, 'profile_embedding', None) is None:
                 candidate = await self.candidate_agent.analyze(candidate, session)
-            if candidate.behavioral_score is None or candidate.growth_score is None:
+            if getattr(candidate, 'behavioral_score', None) is None or getattr(candidate, 'growth_score', None) is None:
                 candidate = await self.behavior_agent.analyze(candidate, session)
-            if candidate.career_growth_score is None:
+            if getattr(candidate, 'growth_score', None) is None:
                 candidate = await self.career_agent.analyze(candidate, session)
-            if candidate.fraud_risk_score is None:
+            if getattr(candidate, 'fraud_risk_score', None) is None:
                 candidate = await self.fraud_agent.analyze(candidate, session)
             analyzed_candidates.append(candidate)
 

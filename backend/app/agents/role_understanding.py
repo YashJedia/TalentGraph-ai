@@ -68,7 +68,7 @@ class RoleUnderstandingAgent:
 
         technical_skills = [
             {
-                'skill': skill,
+                'skill': item.get('skill'),
                 'importance': 0.9 if item.get('priority') == 'critical' else 0.7,
                 'category': 'technical',
             }
@@ -86,7 +86,7 @@ class RoleUnderstandingAgent:
         ]
 
         if not technical_skills and skills:
-            technical_skills = [{'skill': skill, 'importance': 0.75, 'category': 'technical'} for skill in skills]
+            technical_skills = [{'skill': item.get('skill'), 'importance': 0.75, 'category': 'technical'} for item in required_skills if item.get('skill')]
 
         if not soft_skills:
             soft_skills = [

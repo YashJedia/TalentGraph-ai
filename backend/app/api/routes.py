@@ -7,6 +7,7 @@ from typing import List, Dict, Any, Optional
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import delete, desc, func, select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db_session
 from app.models.database import (
@@ -58,11 +59,30 @@ class InvalidRequest(TalentGraphException):
     pass
 
 
-def _ranking_to_response(ranking: CandidateJobRanking) -> RankingResponse:
+def _candidate_summary(candidate: Candidate) -> Optional[Dict[str, Any]]:
+    if candidate is None:
+        return None
+    return {
+        'id': candidate.id,
+        'candidate_id': candidate.candidate_id,
+        'anonymized_name': candidate.anonymized_name,
+        'headline': candidate.headline,
+        'current_title': candidate.current_title,
+        'current_company': candidate.current_company,
+        'years_of_experience': float(candidate.years_of_experience or 0.0) if candidate.years_of_experience is not None else None,
+        'growth_score': float(candidate.growth_score or 0.0) if candidate.growth_score is not None else None,
+        'behavioral_score': float(candidate.behavioral_score or 0.0) if candidate.behavioral_score is not None else None,
+        'fraud_risk_score': float(candidate.fraud_risk_score or 0.0) if candidate.fraud_risk_score is not None else None,
+        'profile_completeness': float(candidate.profile_completeness or 0.0) if candidate.profile_completeness is not None else None,
+    }
+
+
+def _ranking_to_response(ranking: CandidateJobRanking, candidate: Optional[Candidate] = None) -> RankingResponse:
     return RankingResponse(
         id=ranking.id,
         job_id=ranking.job_id,
         candidate_id=ranking.candidate_id,
+        candidate=_candidate_summary(candidate) if candidate else None,
         final_score=float(ranking.final_score or 0.0),
         rank=ranking.rank or 0,
         percentile=float(ranking.percentile or 0.0),
@@ -361,6 +381,31 @@ async def get_candidate(candidate_id: UUID, session: AsyncSession = Depends(get_
     return CandidateResponse.model_validate(candidate)
 
 
+@api_router.post("/candidates", response_model=CandidateResponse, status_code=status.HTTP_201_CREATED)
+async def create_candidate(candidate_create: CandidateCreate, session: AsyncSession = Depends(get_db_session)) -> CandidateResponse:
+    candidate_payload = candidate_create.model_dump(exclude_none=True)
+    skills_data = candidate_payload.pop("skills", [])
+    career_history_data = candidate_payload.pop("career_history", [])
+    education_data = candidate_payload.pop("education", [])
+
+    candidate = Candidate(**candidate_payload)
+    session.add(candidate)
+    await session.flush()
+
+    for item in skills_data:
+        session.add(Skill(**item, candidate_id=candidate.id))
+
+    for item in career_history_data:
+        session.add(CareerHistory(**item, candidate_id=candidate.id))
+
+    for item in education_data:
+        session.add(Education(**item, candidate_id=candidate.id))
+
+    await session.commit()
+    await session.refresh(candidate)
+    return CandidateResponse.model_validate(candidate)
+
+
 @api_router.post("/candidates/bulk", response_model=List[CandidateResponse], status_code=status.HTTP_201_CREATED)
 async def bulk_upload_candidates(
     payload: CandidateBulkUpload, session: AsyncSession = Depends(get_db_session)
@@ -402,12 +447,17 @@ async def get_rankings(job_id: UUID, limit: int = 20, session: AsyncSession = De
     query = select(CandidateJobRanking).where(CandidateJobRanking.job_id == job_id).order_by(desc(CandidateJobRanking.final_score)).limit(limit)
     result = await session.execute(query)
     rankings = result.scalars().all()
-    ranking_models = [_ranking_to_response(ranking) for ranking in rankings]
-    top_10 = ranking_models[:10]
-    hidden_gems = [ranking for ranking in ranking_models if ranking.is_hidden_gem]
+
+    ranked_models = []
+    for ranking in rankings:
+        candidate = await session.get(Candidate, ranking.candidate_id)
+        ranked_models.append(_ranking_to_response(ranking, candidate=candidate))
+
+    top_10 = ranked_models[:10]
+    hidden_gems = [ranking for ranking in ranked_models if ranking.is_hidden_gem]
     return RankingListResponse(
-        total_candidates=len(ranking_models),
-        ranked_candidates=ranking_models,
+        total_candidates=len(ranked_models),
+        ranked_candidates=ranked_models,
         top_10_percentile=top_10,
         hidden_gems=hidden_gems,
     )
@@ -418,7 +468,12 @@ async def get_top_rankings(job_id: UUID, session: AsyncSession = Depends(get_db_
     query = select(CandidateJobRanking).where(CandidateJobRanking.job_id == job_id).order_by(desc(CandidateJobRanking.final_score)).limit(10)
     result = await session.execute(query)
     rankings = result.scalars().all()
-    return [_ranking_to_response(ranking) for ranking in rankings]
+
+    ranked_models = []
+    for ranking in rankings:
+        candidate = await session.get(Candidate, ranking.candidate_id)
+        ranked_models.append(_ranking_to_response(ranking, candidate=candidate))
+    return ranked_models
 
 
 @api_router.get("/rankings/hidden-gems", response_model=List[RankingResponse])
@@ -428,7 +483,12 @@ async def get_all_hidden_gems(session: AsyncSession = Depends(get_db_session)) -
     ).order_by(desc(CandidateJobRanking.final_score)).limit(50)
     result = await session.execute(query)
     rankings = result.scalars().all()
-    return [_ranking_to_response(ranking) for ranking in rankings]
+
+    ranked_models = []
+    for ranking in rankings:
+        candidate = await session.get(Candidate, ranking.candidate_id)
+        ranked_models.append(_ranking_to_response(ranking, candidate=candidate))
+    return ranked_models
 
 
 @api_router.get("/rankings/{job_id}/hidden-gems", response_model=List[RankingResponse])
@@ -439,7 +499,12 @@ async def get_hidden_gems(job_id: UUID, session: AsyncSession = Depends(get_db_s
     ).order_by(desc(CandidateJobRanking.final_score))
     result = await session.execute(query)
     rankings = result.scalars().all()
-    return [_ranking_to_response(ranking) for ranking in rankings]
+
+    ranked_models = []
+    for ranking in rankings:
+        candidate = await session.get(Candidate, ranking.candidate_id)
+        ranked_models.append(_ranking_to_response(ranking, candidate=candidate))
+    return ranked_models
 
 
 @api_router.get("/fraud/alerts", response_model=FraudAlertsResponse)
@@ -488,8 +553,13 @@ async def compare_candidates(
         "Check candidate fit against required skills and seniority level.",
     ]
 
+    comparison_models = []
+    for ranking in rankings:
+        candidate = await session.get(Candidate, ranking.candidate_id)
+        comparison_models.append(_ranking_to_response(ranking, candidate=candidate))
+
     return CandidateComparisonResponse(
-        candidates=[_ranking_to_response(ranking) for ranking in rankings],
+        candidates=comparison_models,
         comparison_metrics=comparison_metrics,
         recommendations=recommendations,
     )
@@ -627,7 +697,12 @@ async def import_candidate_dataset(
 @api_router.post("/rankings/job/{job_id}", response_model=RankingListResponse)
 async def rank_candidates_for_job(job_id: UUID, limit: int = 50, session: AsyncSession = Depends(get_db_session)) -> RankingListResponse:
     job = await _get_job_or_404(job_id, session)
-    candidates_result = await session.execute(select(Candidate))
+    candidates_query = select(Candidate).options(
+        selectinload(Candidate.skills),
+        selectinload(Candidate.career_history),
+        selectinload(Candidate.education),
+    )
+    candidates_result = await session.execute(candidates_query)
     candidates = candidates_result.scalars().all()
     if not candidates:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No candidates available for ranking")
@@ -636,7 +711,11 @@ async def rank_candidates_for_job(job_id: UUID, limit: int = 50, session: AsyncS
     await session.commit()
 
     rankings = await orchestrator.rank_job(job, candidates, session, limit=limit)
-    ranked_models = [_ranking_to_response(ranking) for ranking in rankings]
+    ranked_models = []
+    for ranking in rankings:
+        candidate = next((candidate for candidate in candidates if candidate.id == ranking.candidate_id), None)
+        ranked_models.append(_ranking_to_response(ranking, candidate=candidate))
+
     top_10 = ranked_models[:10]
     hidden_gems = [ranking for ranking in ranked_models if ranking.is_hidden_gem]
     return RankingListResponse(
@@ -652,7 +731,8 @@ async def get_ranking(ranking_id: UUID, session: AsyncSession = Depends(get_db_s
     ranking = await session.get(CandidateJobRanking, ranking_id)
     if ranking is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ranking not found")
-    return _ranking_to_response(ranking)
+    candidate = await session.get(Candidate, ranking.candidate_id)
+    return _ranking_to_response(ranking, candidate=candidate)
 
 
 @api_router.post("/rankings/{ranking_id}/explain", response_model=RankingExplanationResponse)
@@ -689,6 +769,11 @@ async def search_candidates(query: CandidateSearchQuery, session: AsyncSession =
     ranking_query = select(CandidateJobRanking).where(CandidateJobRanking.job_id == query.job_id)
     if query.exclude_fraud_flagged:
         ranking_query = ranking_query.where(CandidateJobRanking.is_fraud_flagged.is_(False))
+    if query.min_score is not None:
+        ranking_query = ranking_query.where(CandidateJobRanking.final_score >= query.min_score)
+    if not query.include_hidden_gems:
+        ranking_query = ranking_query.where(CandidateJobRanking.is_hidden_gem.is_(False))
+
     ranking_query = ranking_query.order_by(desc(CandidateJobRanking.final_score)).limit(query.limit).offset(query.offset)
     result = await session.execute(ranking_query)
     rankings = result.scalars().all()

@@ -40,7 +40,7 @@ class CareerTrajectoryAgent:
             'scope_increase': self._quality_score(0.5 + len(candidate.career_history or []) * 0.03),
             'impact_level': self._quality_score(0.55 + len(candidate.career_history or []) * 0.02),
         }
-        candidate.career_growth_score = round(
+        candidate.growth_score = round(
             min(
                 1.0,
                 (

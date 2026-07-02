@@ -116,22 +116,22 @@ class CandidateUpdate(BaseModel):
 
 class CandidateBase(BaseModel):
     candidate_id: str
-    anonymized_name: str
-    headline: str
-    summary: str
-    location: str
-    country: str
-    years_of_experience: float
-    current_title: str
-    current_company: str
-    current_company_size: str
-    current_industry: str
+    anonymized_name: Optional[str] = None
+    headline: Optional[str] = None
+    summary: Optional[str] = None
+    location: Optional[str] = None
+    country: Optional[str] = None
+    years_of_experience: Optional[float] = None
+    current_title: Optional[str] = None
+    current_company: Optional[str] = None
+    current_company_size: Optional[str] = None
+    current_industry: Optional[str] = None
 
 
 class CandidateCreate(CandidateBase):
-    career_history: List[CareerEntry]
-    education: List[EducationDetail]
-    skills: List[CandidateSkill]
+    career_history: Optional[List[CareerEntry]] = None
+    education: Optional[List[EducationDetail]] = None
+    skills: Optional[List[CandidateSkill]] = None
 
 
 class CandidateResponse(CandidateBase):
@@ -146,6 +146,23 @@ class CandidateResponse(CandidateBase):
     profile_completeness: Optional[float] = None
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class CandidateSummary(BaseModel):
+    id: UUID
+    candidate_id: str
+    anonymized_name: Optional[str] = None
+    headline: Optional[str] = None
+    current_title: Optional[str] = None
+    current_company: Optional[str] = None
+    years_of_experience: Optional[float] = None
+    growth_score: Optional[float] = None
+    behavioral_score: Optional[float] = None
+    fraud_risk_score: Optional[float] = None
+    profile_completeness: Optional[float] = None
 
     class Config:
         from_attributes = True
@@ -172,6 +189,7 @@ class RankingResponse(BaseModel):
     id: UUID
     job_id: UUID
     candidate_id: UUID
+    candidate: Optional[CandidateSummary] = None
     final_score: float
     rank: int
     percentile: float

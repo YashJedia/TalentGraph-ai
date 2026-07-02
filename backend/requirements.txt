@@ -18,6 +18,12 @@ sqlmodel==0.0.14
 # Vector Database
 qdrant-client==1.13.0
 
+# Search & Ranking
+rank-bm25==0.2.2
+
+# ML & Anomaly Detection (optional for fraud detection)
+scikit-learn==1.3.2
+
 # Numerical utilities
 numpy==1.26.2
 
