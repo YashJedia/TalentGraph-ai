@@ -1,33 +1,65 @@
-# Python
+# Python & Backend
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.egg-info/
 .venv/
 venv/
 env/
 .pytest_cache/
 .venv-test/
+.mypy_cache/
+.ruff_cache/
+.tox/
 
-# Environment files
-.env
-.env.*
-
-# Node / frontend
+# Node / Frontend
 node_modules/
+**/node_modules/
 dist/
 build/
 .vite/
+.svelte-kit/
+.next/
+out/
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Database / local data
+# Environment / Secret Configurations
+.env
+.env.*
+*.env
+!*.env.example
+.secrets
+secrets/
+jwt_key*
+
+# Database & Storage
 *.sqlite3
 *.db
+*.sqlite
+*.rdb
 *.log
+qdrant_storage/
+postgres_data/
 
-# OS files
+# Host Build Artifacts / Logs
+build_*.txt
+*.txt.bak
+*_logs.txt
+status.txt
+frontend_logs.txt
+
+# OS & Editor configurations
 .DS_Store
 Thumbs.db
-
-# IDE files
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
