@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../services/api'
-import { Server, Database, ShieldAlert, Cpu, HardDrive, ShieldCheck } from 'lucide-react'
+import { Server, Database, ShieldCheck } from 'lucide-react'
 
 type FooterStats = {
   total_jobs: number

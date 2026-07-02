@@ -11,7 +11,6 @@ import {
   Database,
   Sparkles,
   TrendingUp,
-  Cpu,
 } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
