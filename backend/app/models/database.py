@@ -1,12 +1,19 @@
 """SQLAlchemy database models"""
 
-from sqlalchemy import Column, String, Integer, Float, DateTime, Boolean, JSON, Text, ForeignKey, Index, UUID as SQLALCHEMY_UUID, func, DECIMAL
+from sqlalchemy import Column, String, Integer, Float, DateTime, Boolean, JSON, Text, ForeignKey, Index, func, DECIMAL
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import JSONB, UUID
 from uuid import uuid4
 import datetime
 
 from app.db.session import Base
+
+
+def _uuid_default():
+    return str(uuid4())
+
+
+# Use String(36) for UUID columns (works on both SQLite and PostgreSQL)
+UUIDColumn = String(36)
 
 
 class Job(Base):
@@ -14,31 +21,31 @@ class Job(Base):
 
     __tablename__ = "jobs"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id = Column(UUIDColumn, primary_key=True, default=_uuid_default)
     job_title = Column(String(255), nullable=False, index=True)
     company_name = Column(String(255), nullable=False, index=True)
     job_description = Column(Text, nullable=False)
-    required_skills = Column(JSONB, nullable=True)
-    nice_to_have_skills = Column(JSONB, nullable=True)
+    required_skills = Column(JSON, nullable=True)
+    nice_to_have_skills = Column(JSON, nullable=True)
     required_experience_years = Column(Integer, nullable=True)
     seniority_level = Column(String(50), nullable=True, index=True)
     location = Column(String(255), nullable=True)
     remote_option = Column(String(50), nullable=True)
-    salary_range = Column(JSONB, nullable=True)
+    salary_range = Column(JSON, nullable=True)
 
     # Role Understanding Agent Output
-    technical_skills = Column(JSONB, nullable=True)
-    soft_skills = Column(JSONB, nullable=True)
-    leadership_requirements = Column(JSONB, nullable=True)
-    seniority_analysis = Column(JSONB, nullable=True)
-    culture_signals = Column(JSONB, nullable=True)
+    technical_skills = Column(JSON, nullable=True)
+    soft_skills = Column(JSON, nullable=True)
+    leadership_requirements = Column(JSON, nullable=True)
+    seniority_analysis = Column(JSON, nullable=True)
+    culture_signals = Column(JSON, nullable=True)
 
     # Embeddings
-    job_embedding = Column(JSONB, nullable=True)  # Store as JSON array, use pgvector in future
+    job_embedding = Column(JSON, nullable=True)  # Store as JSON array, use pgvector in future
 
     created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
-    created_by = Column(UUID(as_uuid=True), nullable=True)
+    created_by = Column(UUIDColumn, nullable=True)
 
     # Relationships
     rankings = relationship("CandidateJobRanking", back_populates="job", cascade="all, delete-orphan")
@@ -53,7 +60,7 @@ class Candidate(Base):
 
     __tablename__ = "candidates"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id = Column(UUIDColumn, primary_key=True, default=_uuid_default)
     candidate_id = Column(String(50), unique=True, nullable=False, index=True)
     anonymized_name = Column(String(255), nullable=True)
     headline = Column(String(255), nullable=True)
@@ -67,9 +74,9 @@ class Candidate(Base):
     current_industry = Column(String(100), nullable=True)
 
     # Candidate Intelligence Agent Output
-    profile_embedding = Column(JSONB, nullable=True)
-    skill_depth = Column(JSONB, nullable=True)
-    experience_level = Column(JSONB, nullable=True)
+    profile_embedding = Column(JSON, nullable=True)
+    skill_depth = Column(JSON, nullable=True)
+    experience_level = Column(JSON, nullable=True)
     leadership_score = Column(DECIMAL(3, 2), nullable=True)
     growth_score = Column(DECIMAL(3, 2), nullable=True)
     behavioral_score = Column(DECIMAL(3, 2), nullable=True)
@@ -77,14 +84,14 @@ class Candidate(Base):
 
     # Career Trajectory Analysis
     promotion_velocity = Column(DECIMAL(5, 2), nullable=True)
-    career_growth_trend = Column(JSONB, nullable=True)
-    skill_evolution = Column(JSONB, nullable=True)
-    responsibility_growth = Column(JSONB, nullable=True)
+    career_growth_trend = Column(JSON, nullable=True)
+    skill_evolution = Column(JSON, nullable=True)
+    responsibility_growth = Column(JSON, nullable=True)
 
     # Fraud Detection
     fraud_risk_score = Column(DECIMAL(3, 2), nullable=True)
-    fraud_signals = Column(JSONB, nullable=True)
-    anomaly_flags = Column(JSONB, nullable=True)
+    fraud_signals = Column(JSON, nullable=True)
+    anomaly_flags = Column(JSON, nullable=True)
 
     # Profile Quality
     profile_completeness = Column(DECIMAL(3, 2), nullable=True)
@@ -92,7 +99,7 @@ class Candidate(Base):
     recruiter_response_rate = Column(DECIMAL(3, 2), nullable=True)
     assessment_completion_rate = Column(DECIMAL(3, 2), nullable=True)
 
-    raw_data = Column(JSONB, nullable=True)
+    raw_data = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, index=True)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
@@ -113,8 +120,8 @@ class CareerHistory(Base):
 
     __tablename__ = "career_history"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    candidate_id = Column(UUID(as_uuid=True), ForeignKey("candidates.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(UUIDColumn, primary_key=True, default=_uuid_default)
+    candidate_id = Column(UUIDColumn, ForeignKey("candidates.id"), nullable=False, index=True)
     company = Column(String(255), nullable=True)
     title = Column(String(255), nullable=True, index=True)
     start_date = Column(DateTime, nullable=True)
@@ -124,8 +131,8 @@ class CareerHistory(Base):
     industry = Column(String(100), nullable=True)
     company_size = Column(String(50), nullable=True)
     description = Column(Text, nullable=True)
-    responsibilities = Column(JSONB, nullable=True)
-    achievements = Column(JSONB, nullable=True)
+    responsibilities = Column(JSON, nullable=True)
+    achievements = Column(JSON, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     # Relationships
@@ -137,8 +144,8 @@ class Education(Base):
 
     __tablename__ = "education"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    candidate_id = Column(UUID(as_uuid=True), ForeignKey("candidates.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(UUIDColumn, primary_key=True, default=_uuid_default)
+    candidate_id = Column(UUIDColumn, ForeignKey("candidates.id"), nullable=False, index=True)
     institution = Column(String(255), nullable=True, index=True)
     degree = Column(String(100), nullable=True)
     field_of_study = Column(String(255), nullable=True)
@@ -157,8 +164,8 @@ class Skill(Base):
 
     __tablename__ = "skills"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    candidate_id = Column(UUID(as_uuid=True), ForeignKey("candidates.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(UUIDColumn, primary_key=True, default=_uuid_default)
+    candidate_id = Column(UUIDColumn, ForeignKey("candidates.id"), nullable=False, index=True)
     skill_name = Column(String(255), nullable=False, index=True)
     proficiency = Column(String(50), nullable=True)  # beginner, intermediate, advanced, expert
     endorsements = Column(Integer, default=0)
@@ -177,9 +184,9 @@ class CandidateJobRanking(Base):
 
     __tablename__ = "candidate_job_rankings"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    job_id = Column(UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"), nullable=False, index=True)
-    candidate_id = Column(UUID(as_uuid=True), ForeignKey("candidates.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(UUIDColumn, primary_key=True, default=_uuid_default)
+    job_id = Column(UUIDColumn, ForeignKey("jobs.id"), nullable=False, index=True)
+    candidate_id = Column(UUIDColumn, ForeignKey("candidates.id"), nullable=False, index=True)
 
     # Individual Scores
     semantic_match_score = Column(DECIMAL(3, 2), nullable=True)
@@ -195,11 +202,11 @@ class CandidateJobRanking(Base):
     percentile = Column(DECIMAL(5, 2), nullable=True)
 
     # Explanations
-    top_strengths = Column(JSONB, nullable=True)
-    potential_risks = Column(JSONB, nullable=True)
-    hidden_gem_indicators = Column(JSONB, nullable=True)
-    transferable_skills_analysis = Column(JSONB, nullable=True)
-    career_trajectory_fit = Column(JSONB, nullable=True)
+    top_strengths = Column(JSON, nullable=True)
+    potential_risks = Column(JSON, nullable=True)
+    hidden_gem_indicators = Column(JSON, nullable=True)
+    transferable_skills_analysis = Column(JSON, nullable=True)
+    career_trajectory_fit = Column(JSON, nullable=True)
 
     # Flags
     is_hidden_gem = Column(Boolean, default=False)
@@ -228,12 +235,12 @@ class RankingExplanation(Base):
 
     __tablename__ = "ranking_explanations"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    ranking_id = Column(UUID(as_uuid=True), ForeignKey("candidate_job_rankings.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(UUIDColumn, primary_key=True, default=_uuid_default)
+    ranking_id = Column(UUIDColumn, ForeignKey("candidate_job_rankings.id"), nullable=False, index=True)
 
     # SHAP Explanations
-    feature_importance = Column(JSONB, nullable=True)
-    top_contributing_factors = Column(JSONB, nullable=True)
+    feature_importance = Column(JSON, nullable=True)
+    top_contributing_factors = Column(JSON, nullable=True)
 
     # Narrative Explanations
     why_selected_narrative = Column(Text, nullable=True)
@@ -241,8 +248,8 @@ class RankingExplanation(Base):
     opportunities_narrative = Column(Text, nullable=True)
 
     # Visual Explanations
-    radar_chart_data = Column(JSONB, nullable=True)
-    comparison_metrics = Column(JSONB, nullable=True)
+    radar_chart_data = Column(JSON, nullable=True)
+    comparison_metrics = Column(JSON, nullable=True)
 
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
@@ -256,17 +263,17 @@ class FraudAlert(Base):
 
     __tablename__ = "fraud_alerts"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    candidate_id = Column(UUID(as_uuid=True), ForeignKey("candidates.id", ondelete="CASCADE"), nullable=False, index=True)
+    id = Column(UUIDColumn, primary_key=True, default=_uuid_default)
+    candidate_id = Column(UUIDColumn, ForeignKey("candidates.id"), nullable=False, index=True)
 
     alert_type = Column(String(100), nullable=False)  # skill_stuffing, timeline_inconsistency, etc.
     severity = Column(String(20), nullable=False, index=True)  # low, medium, high, critical
     description = Column(Text, nullable=True)
-    evidence = Column(JSONB, nullable=True)
+    evidence = Column(JSON, nullable=True)
     confidence_score = Column(DECIMAL(3, 2), nullable=True)
 
     is_reviewed = Column(Boolean, default=False, index=True)
-    reviewer_id = Column(UUID(as_uuid=True), nullable=True)
+    reviewer_id = Column(UUIDColumn, nullable=True)
     reviewer_notes = Column(Text, nullable=True)
 
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
