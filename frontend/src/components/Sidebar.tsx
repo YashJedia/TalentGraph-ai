@@ -23,7 +23,7 @@ export default function Sidebar() {
   const location = useLocation()
 
   return (
-    <aside className="sticky top-0 h-screen flex w-72 flex-col border-r border-slate-800/40 bg-slate-950/60 p-5 backdrop-blur-2xl z-30">
+    <aside className="fixed top-0 left-0 h-screen flex w-72 flex-col border-r border-slate-800/40 bg-slate-950/60 p-5 backdrop-blur-2xl z-30">
       {/* Branding Hub */}
       <div className="mb-8 rounded-2xl border border-slate-800/60 bg-slate-900/30 p-4 ring-1 ring-white/5">
         <div className="flex items-center gap-3">

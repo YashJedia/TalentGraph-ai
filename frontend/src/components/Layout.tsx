@@ -17,7 +17,7 @@ export default function Layout({ children }: LayoutProps) {
 
       <div className="relative z-10 flex w-full">
         <Sidebar />
-        <div className="flex-1 min-h-screen flex flex-col">
+        <div className="flex-1 min-h-screen flex flex-col pl-72">
           <Header />
           <main className="flex-grow overflow-auto px-6 py-8 pt-10 lg:px-10">
             <div className="mx-auto w-full max-w-[1520px]">{children}</div>
