@@ -9,7 +9,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="relative flex min-h-screen bg-slate-950 text-slate-100 overflow-hidden">
+    <div className="relative flex min-h-screen bg-[#070913] text-slate-100 overflow-hidden">
       {/* Dynamic Background Blobs */}
       <div className="blob-sky" />
       <div className="blob-violet" />

@@ -13,8 +13,8 @@
   --primary: #38bdf8;
   --primary-dark: #0f172a;
   --secondary: #c084fc;
-  --background: #030712;
-  --background-secondary: #0b1528;
+  --background: #070913;
+  --background-secondary: #0c0f1d;
   --surface: rgba(17, 24, 39, 0.82);
   --surface-strong: #0f172a;
   --surface-soft: rgba(17, 24, 39, 0.6);
@@ -37,7 +37,7 @@ html {
 body {
   min-height: 100vh;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #030712;
+  background: #070913;
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -235,15 +235,8 @@ textarea:focus {
   bottom: 0;
   left: 0;
   transform: translateX(-100%);
-  background-gradient: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.05) 20%,
-    rgba(255, 255, 255, 0.1) 60%,
-    rgba(255, 255, 255, 0) 100%
-  );
   background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.06) 30%, rgba(255, 255, 255, 0.12) 60%, rgba(255, 255, 255, 0) 100%);
-  animation: shimmer 1.8s infinite;
+  animation: shimmer-anim 1.6s infinite;
 }
 
 /* Status breathing lights */
