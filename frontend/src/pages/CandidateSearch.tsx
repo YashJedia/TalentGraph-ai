@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api } from '../services/api'
+import { Search, SlidersHorizontal, Briefcase, MapPin, Award } from 'lucide-react'
 
 type Candidate = {
   id: string
@@ -100,36 +101,64 @@ export default function CandidateSearch() {
     })
   }, [candidates, searchResults, searchTerm, selectedJob])
 
+  // Get initials for name avatar
+  const getInitials = (name?: string) => {
+    if (!name) return 'C'
+    const parts = name.trim().split(/\s+/)
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+    }
+    return parts[0][0].toUpperCase()
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in-up">
+      {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-semibold text-white">Candidate Search</h1>
-        <p className="mt-3 text-slate-400 max-w-2xl">Filter and inspect candidate profiles across the TalentGraph database.</p>
+        <h1 className="text-3xl font-extrabold text-white flex items-center gap-2">
+          Candidate Search
+        </h1>
+        <p className="mt-2 text-sm text-slate-400 max-w-2xl">
+          Filter and inspect candidate profiles with active semantic attributes and experience qualifiers.
+        </p>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[300px_1fr]">
-        <div className="rounded-[32px] border border-white/10 bg-slate-900/95 p-7 shadow-[0_28px_80px_rgba(15,23,42,0.35)]">
-          <div className="space-y-6">
-            <div>
-              <label className="text-sm font-semibold text-slate-300">Search candidates</label>
+      <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
+        {/* Left filter card */}
+        <div className="glass-card rounded-[24px] border border-slate-800 bg-slate-950/40 p-6 flex flex-col gap-6 h-fit">
+          <h2 className="text-lg font-bold text-white flex items-center gap-1.5 border-b border-slate-900 pb-3">
+            <SlidersHorizontal size={16} className="text-sky-400" />
+            Search Filters
+          </h2>
+          
+          <div className="space-y-5">
+            {/* Search inputs */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                <Search size={11} className="text-sky-400" /> Keyword query
+              </label>
               <input
-                className="mt-4 w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-4 text-slate-100 outline-none focus:border-sky-500"
-                placeholder="Name, title, location or skill"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900/30 px-3.5 py-3 text-sm text-slate-100 placeholder:text-slate-500 outline-none focus:border-sky-500"
+                placeholder="Name, skills, title, location"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
               />
             </div>
-            <div>
-              <label className="text-sm font-semibold text-slate-300">Filter by job</label>
+
+            {/* Job role matches */}
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                <Briefcase size={11} className="text-sky-400" /> Job Matching Profile
+              </label>
               <select
-                className="mt-4 w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-4 text-slate-100 outline-none focus:border-sky-500"
+                className="w-full rounded-xl border border-slate-800 bg-slate-900/30 px-3.5 py-3 text-sm text-slate-100 outline-none focus:border-sky-500"
                 value={selectedJob}
                 onChange={(event) => setSelectedJob(event.target.value)}
               >
-                <option value="">All jobs</option>
+                <option value="" className="bg-slate-950">All Candidates</option>
                 {jobs.map((job) => (
-                  <option key={job.id} value={job.id}>
-                    {job.job_title} at {job.company_name}
+                  <option key={job.id} value={job.id} className="bg-slate-950">
+                    {job.job_title} ({job.company_name})
                   </option>
                 ))}
               </select>
@@ -137,52 +166,86 @@ export default function CandidateSearch() {
           </div>
         </div>
 
-        <div className="rounded-[32px] border border-white/10 bg-slate-900/95 p-7 shadow-[0_28px_80px_rgba(15,23,42,0.35)]">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        {/* Right results grid */}
+        <div className="glass-card rounded-[24px] border border-slate-800 bg-slate-950/40 p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-900 pb-4">
             <div>
-              <h2 className="text-xl font-semibold text-white">Search results</h2>
-              <p className="mt-2 text-sm text-slate-400">Browse candidates and explore their profile summaries.</p>
+              <h2 className="text-lg font-bold text-white">Ingested Rosters</h2>
+              <p className="text-xs text-slate-400">Match credentials across vectors index and local lists.</p>
             </div>
-            <span className="inline-flex rounded-2xl bg-slate-800 px-4 py-2 text-sm text-slate-200 shadow-inner shadow-slate-950/20">
-              {loading || searching ? 'Loading...' : `${filteredCandidates.length} results`}
+            <span className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-bold text-slate-300 border border-slate-800/80 shadow-md">
+              {loading || searching ? (
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-ping" />
+                  Resolving...
+                </span>
+              ) : (
+                `${filteredCandidates.length} Active Records`
+              )}
             </span>
           </div>
-          <div className="mt-8 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/95 shadow-inner shadow-slate-950/10">
+
+          {/* Table list */}
+          <div className="mt-6 overflow-hidden rounded-xl border border-slate-900 bg-slate-950/20">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
-                <thead className="bg-slate-900 text-slate-400">
+              <table className="min-w-full divide-y divide-slate-900/80 text-left text-xs text-slate-300">
+                <thead className="bg-slate-900/60 text-slate-400 uppercase tracking-wider font-bold">
                   <tr>
-                    <th className="px-4 py-4">Candidate</th>
-                    <th className="px-4 py-4">Title</th>
-                    <th className="px-4 py-4">Location</th>
-                    <th className="px-4 py-4">Experience</th>
-                    <th className="px-4 py-4">Company</th>
+                    <th className="px-5 py-3.5">Candidate name</th>
+                    <th className="px-5 py-3.5">Current Role</th>
+                    <th className="px-5 py-3.5"><span className="flex items-center gap-1"><MapPin size={12} /> Location</span></th>
+                    <th className="px-5 py-3.5"><span className="flex items-center gap-1"><Award size={12} /> Tenures</span></th>
+                    <th className="px-5 py-3.5">Enterprise</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800">
-                  {(loading || searching) && selectedJob ? (
-                    <tr>
-                      <td className="px-4 py-10 text-slate-500" colSpan={5}>
-                        Loading search results...
-                      </td>
-                    </tr>
+                <tbody className="divide-y divide-slate-900/40">
+                  {loading || searching ? (
+                    // Shimmer rows
+                    Array.from({ length: 5 }).map((_, idx) => (
+                      <tr key={idx}>
+                        <td className="px-5 py-4" colSpan={5}>
+                          <div className="h-5 rounded-lg shimmer-placeholder w-full" />
+                        </td>
+                      </tr>
+                    ))
                   ) : filteredCandidates.length === 0 ? (
                     <tr>
-                      <td className="px-4 py-10 text-slate-500" colSpan={5}>
-                        {loading ? 'Loading candidates…' : 'No candidates match your search criteria.'}
+                      <td className="px-5 py-10 text-slate-500 text-center" colSpan={5}>
+                        No candidates match your queries in the database. Try adjusting your filter tags.
                       </td>
                     </tr>
                   ) : (
                     filteredCandidates.map((candidate) => (
-                      <tr key={candidate.id} className="transition hover:bg-slate-900/80">
-                        <td className="px-4 py-4">
-                          <div className="font-semibold text-white">{candidate.anonymized_name}</div>
-                          <div className="text-xs text-slate-500">{candidate.candidate_id}</div>
+                      <tr 
+                        key={candidate.id} 
+                        className="transition hover:bg-slate-900/35 group"
+                      >
+                        {/* Name Block with Avatar initials */}
+                        <td className="px-5 py-4 flex items-center gap-3">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500/10 to-violet-500/10 border border-sky-500/15 text-sky-400 font-extrabold text-xs shadow-inner">
+                            {getInitials(candidate.anonymized_name)}
+                          </div>
+                          <div>
+                            <div className="font-bold text-white group-hover:text-sky-400 transition">
+                              {candidate.anonymized_name || 'Anonymous Profile'}
+                            </div>
+                            <div className="text-[10px] text-slate-500 font-mono mt-0.5">{candidate.candidate_id}</div>
+                          </div>
                         </td>
-                        <td className="px-4 py-4">{candidate.current_title || candidate.headline || '—'}</td>
-                        <td className="px-4 py-4">{candidate.location || '—'}</td>
-                        <td className="px-4 py-4">{candidate.years_of_experience ?? '—'} yrs</td>
-                        <td className="px-4 py-4">{candidate.current_company || '—'}</td>
+                        <td className="px-5 py-4 font-semibold text-slate-300">
+                          {candidate.current_title || candidate.headline || '—'}
+                        </td>
+                        <td className="px-5 py-4 text-slate-400 text-xs">
+                          {candidate.location || 'Remote'}
+                        </td>
+                        <td className="px-5 py-4">
+                          <span className="inline-flex items-center gap-1.5 rounded-lg bg-sky-500/5 border border-sky-500/10 px-2 py-1 text-slate-300 font-bold font-mono">
+                            {candidate.years_of_experience ?? 0} yrs
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 text-slate-400">
+                          {candidate.current_company || 'Freelance'}
+                        </td>
                       </tr>
                     ))
                   )}

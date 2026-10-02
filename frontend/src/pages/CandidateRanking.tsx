@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { api } from '../services/api'
+import { AlertTriangle, Trophy, RefreshCw, Sparkles, HelpCircle, Briefcase } from 'lucide-react'
 
 type Job = {
   id: string
@@ -114,108 +115,190 @@ export default function CandidateRanking() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in-up">
+      {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-semibold text-white">Candidate Ranking</h1>
-        <p className="mt-3 text-slate-400 max-w-2xl">Rank candidates for hiring roles using TalentGraph scoring signals.</p>
+        <h1 className="text-3xl font-extrabold text-white flex items-center gap-2">
+          Candidate Ranking
+        </h1>
+        <p className="mt-2 text-sm text-slate-400 max-w-2xl">
+          Evaluate credentials against custom target requirements using our multi-agent composite scoring models.
+        </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
-        <div className="rounded-[32px] border border-white/10 bg-slate-900/95 p-7 shadow-[0_28px_80px_rgba(15,23,42,0.35)]">
-          <h2 className="text-xl font-semibold text-white">Select job</h2>
-          <p className="mt-2 text-sm text-slate-400">Choose a role to view ranked candidates.</p>
+        {/* Left card control */}
+        <div className="glass-card rounded-[24px] border border-slate-800 bg-slate-950/40 p-6 flex flex-col gap-6 h-fit">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2 border-b border-slate-900 pb-3">
+            <Briefcase size={16} className="text-sky-400" />
+            Select Position
+          </h2>
 
-          <select
-            value={selectedJobId}
-            onChange={(event) => handleJobChange(event.target.value)}
-            className="mt-5 w-full rounded-3xl border border-slate-700 bg-slate-950 px-4 py-4 text-slate-100 outline-none focus:border-sky-500"
-          >
-            <option value="">Pick a job role</option>
-            {jobs.map((jobItem) => (
-              <option key={jobItem.id} value={jobItem.id}>
-                {jobItem.job_title} — {jobItem.company_name}
-              </option>
-            ))}
-          </select>
-
-          {selectedJobId ? (
-            <div className="mt-6 space-y-4">
-              <button
-                type="button"
-                onClick={handleRankJob}
-                disabled={rankLoading}
-                className="w-full rounded-3xl bg-gradient-to-r from-sky-500 to-violet-600 px-5 py-4 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition hover:from-sky-400 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-60"
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Position Profile</label>
+              <select
+                value={selectedJobId}
+                onChange={(event) => handleJobChange(event.target.value)}
+                className="w-full rounded-xl border border-slate-800 bg-slate-900/30 px-3.5 py-3 text-sm text-slate-100 outline-none focus:border-sky-500"
               >
-                {rankLoading ? 'Ranking candidates...' : 'Rank candidates for this job'}
-              </button>
-              {statusMessage && <p className="text-sm text-slate-400">{statusMessage}</p>}
+                <option value="" className="bg-slate-950">Pick a job role</option>
+                {jobs.map((jobItem) => (
+                  <option key={jobItem.id} value={jobItem.id} className="bg-slate-950">
+                    {jobItem.job_title} ({jobItem.company_name})
+                  </option>
+                ))}
+              </select>
             </div>
-          ) : (
-            <div className="mt-8 rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
-              Select a job to populate ranking results and candidate insights.
-            </div>
-          )}
+
+            {selectedJobId ? (
+              <div className="space-y-4">
+                <button
+                  type="button"
+                  onClick={handleRankJob}
+                  disabled={rankLoading}
+                  className="w-full rounded-xl bg-gradient-to-r from-sky-500 to-violet-600 px-4 py-3 text-xs font-bold text-white shadow-lg shadow-sky-500/20 transition hover:from-sky-400 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-60 flex items-center justify-center gap-1.5"
+                >
+                  <RefreshCw size={12} className={rankLoading ? 'animate-spin' : ''} />
+                  {rankLoading ? 'Computing ratings...' : 'Trigger Agents Review'}
+                </button>
+                {statusMessage && (
+                  <p className="text-[11px] text-sky-400 font-mono text-center">{statusMessage}</p>
+                )}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-slate-800 bg-slate-900/10 p-5 text-xs text-slate-500 leading-relaxed text-center">
+                Select a target role to initialize active scoring rosters and agent reports.
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="rounded-[32px] border border-white/10 bg-slate-900/95 p-7 shadow-[0_28px_80px_rgba(15,23,42,0.35)]">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Right card ranking */}
+        <div className="glass-card rounded-[24px] border border-slate-800 bg-slate-950/40 p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-900 pb-4">
             <div>
-              <h2 className="text-xl font-semibold text-white">{selectedJob?.job_title ?? 'Job ranking details'}</h2>
-              <p className="mt-2 text-sm text-slate-400">{selectedJob ? `${selectedJob.company_name} • ${selectedJob.location ?? 'Remote/Multiple locations'}` : 'Choose a job from the left panel.'}</p>
+              <h2 className="text-lg font-bold text-white">
+                {selectedJob?.job_title ?? 'Rankings Pipeline'}
+              </h2>
+              <p className="text-xs text-slate-400">
+                {selectedJob 
+                  ? `${selectedJob.company_name} • ${selectedJob.location ?? 'Global/Remote'}` 
+                  : 'Select a job search target in the left panel.'
+                }
+              </p>
             </div>
-            <span className="inline-flex rounded-2xl bg-slate-800 px-4 py-2 text-sm text-slate-200 shadow-inner shadow-slate-950/20">{loading ? 'Loading' : `${rankings.length} candidates`}</span>
+            {selectedJobId && (
+              <span className="rounded-xl bg-slate-900 px-3.5 py-2 text-xs font-bold text-slate-300 border border-slate-800/80 shadow-md">
+                {loading ? 'Analyzing...' : `${rankings.length} Matched Candidates`}
+              </span>
+            )}
           </div>
 
           {error && (
-            <div className="mt-6 rounded-3xl border border-rose-700 bg-rose-950/60 p-5 text-rose-200">
+            <div className="mt-5 rounded-xl border border-rose-800 bg-rose-950/30 p-4 text-xs text-rose-300 font-mono">
               {error}
             </div>
           )}
 
-          {selectedJobId && !loading && rankings.length === 0 && (
-            <div className="mt-6 rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-slate-400">
-              No rankings available yet for this role. Confirm candidate data is loaded and trigger a ranking refresh.
+          {/* Table display */}
+          {!selectedJobId ? (
+            <div className="mt-12 py-12 text-center text-slate-500 border border-dashed border-slate-800/60 rounded-xl max-w-md mx-auto px-6">
+              <Trophy size={36} className="mx-auto text-slate-600 mb-4" />
+              <h3 className="text-sm font-bold text-slate-400">No Target Selection</h3>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                Choose a job profile to compare candidates, view alignment percentiles, fraud risks, and hidden gems.
+              </p>
             </div>
-          )}
-
-          {selectedJobId && rankings.length > 0 && (
-            <div className="mt-8 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950/95 shadow-inner shadow-slate-950/10">
+          ) : loading ? (
+            <div className="mt-8 space-y-4">
+              {Array.from({ length: 6 }).map((_, idx) => (
+                <div key={idx} className="h-10 rounded-lg shimmer-placeholder w-full" />
+              ))}
+            </div>
+          ) : rankings.length === 0 ? (
+            <div className="mt-8 border border-dashed border-slate-800/60 rounded-xl p-8 text-center text-slate-500 max-w-sm mx-auto">
+              <HelpCircle size={28} className="mx-auto text-slate-600 mb-3" />
+              <p className="text-xs">No analytics maps have been generated. Click "Trigger Agents Review" to compile composite weights.</p>
+            </div>
+          ) : (
+            <div className="mt-6 overflow-hidden rounded-xl border border-slate-900 bg-slate-950/20">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-slate-800 text-left text-sm text-slate-300">
-                  <thead className="bg-slate-900 text-slate-400">
+                <table className="min-w-full divide-y divide-slate-900/80 text-left text-xs text-slate-300">
+                  <thead className="bg-slate-900/60 text-slate-400 uppercase tracking-wider font-bold">
                     <tr>
-                      <th className="px-4 py-4">Rank</th>
-                      <th className="px-4 py-4">Candidate</th>
-                      <th className="px-4 py-4">Score</th>
-                      <th className="px-4 py-4">Hidden gem</th>
-                      <th className="px-4 py-4">Fraud flag</th>
+                      <th className="px-5 py-3.5 text-center">Rank</th>
+                      <th className="px-5 py-3.5">Candidate Details</th>
+                      <th className="px-5 py-3.5">Agent Score</th>
+                      <th className="px-5 py-3.5 text-center">Gem Status</th>
+                      <th className="px-5 py-3.5 text-center">Compliance</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800">
+                  <tbody className="divide-y divide-slate-900/40">
                     {rankings.map((ranking) => (
-                      <tr key={ranking.id} className="transition hover:bg-slate-900/80">
-                        <td className="px-4 py-4 font-semibold text-white">{ranking.rank}</td>
-                        <td className="px-4 py-4">
-                          <div className="font-semibold text-white">
-                            {ranking.candidate?.anonymized_name ?? ranking.candidate_id}
-                          </div>
-                          <div className="text-slate-400">
-                            {ranking.candidate?.current_title ?? 'Candidate profile'}
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">{Math.round(ranking.final_score * 100)}%</td>
-                        <td className="px-4 py-4">
-                          {ranking.is_hidden_gem ? (
-                            <span className="inline-flex rounded-full bg-emerald-500/15 px-3 py-1 text-xs text-emerald-300">Hidden gem</span>
+                      <tr 
+                        key={ranking.id} 
+                        className="transition hover:bg-slate-900/35 group"
+                      >
+                        {/* Rank with Trophy indicator */}
+                        <td className="px-5 py-4 text-center font-black">
+                          {ranking.rank === 1 ? (
+                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 text-xs font-black shadow-lg shadow-yellow-500/5">
+                              1
+                            </span>
+                          ) : ranking.rank === 2 ? (
+                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-300/10 text-slate-200 border border-slate-300/30 text-xs font-black">
+                              2
+                            </span>
+                          ) : ranking.rank === 3 ? (
+                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-600/10 text-amber-500 border border-amber-600/30 text-xs font-black">
+                              3
+                            </span>
                           ) : (
-                            <span className="inline-flex rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-400">Standard</span>
+                            <span className="text-slate-400">{ranking.rank}</span>
                           )}
                         </td>
-                        <td className="px-4 py-4">
-                          {ranking.is_fraud_flagged ? (
-                            <span className="inline-flex rounded-full bg-rose-500/15 px-3 py-1 text-xs text-rose-300">Flagged</span>
+
+                        {/* Name and description info */}
+                        <td className="px-5 py-4">
+                          <div className="font-bold text-white group-hover:text-sky-400 transition">
+                            {ranking.candidate?.anonymized_name ?? ranking.candidate_id}
+                          </div>
+                          <div className="text-[10px] text-slate-500 mt-0.5 font-semibold">
+                            {ranking.candidate?.current_title ?? 'Assessment Profile'}
+                          </div>
+                        </td>
+
+                        {/* Score Badge */}
+                        <td className="px-5 py-4">
+                          <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-500/5 border border-indigo-500/10 px-2 py-1 text-xs font-black font-mono text-indigo-400">
+                            {Math.round(ranking.final_score * 100)}%
+                          </span>
+                        </td>
+
+                        {/* Gem Status */}
+                        <td className="px-5 py-4 text-center">
+                          {ranking.is_hidden_gem ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-400 shadow-inner">
+                              <Sparkles size={10} className="animate-pulse" /> Hidden Gem
+                            </span>
                           ) : (
-                            <span className="inline-flex rounded-full bg-slate-800 px-3 py-1 text-xs text-slate-400">Clear</span>
+                            <span className="inline-flex rounded-full bg-slate-900 border border-slate-800/80 px-2.5 py-0.5 text-[10px] text-slate-500">
+                              Standard
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Compliance (Fraud Flag) */}
+                        <td className="px-5 py-4 text-center">
+                          {ranking.is_fraud_flagged ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 border border-rose-500/20 px-2.5 py-0.5 text-[10px] font-bold text-rose-400 indicator-pulse">
+                              <AlertTriangle size={10} /> Flagged Anomaly
+                            </span>
+                          ) : (
+                            <span className="inline-flex rounded-full bg-slate-900 border border-slate-800/80 px-2.5 py-0.5 text-[10px] text-emerald-400 font-bold">
+                              Clear
+                            </span>
                           )}
                         </td>
                       </tr>
